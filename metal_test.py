@@ -17,7 +17,8 @@ def main():
     data[:,1] -= 50
     # print(data[:,1])；
     for row in data:
-        harvest[int(row[0]), int(row[1])] = len_cal(row[3:6])
+        harvest[int(row[0]), int(row[1])] = \
+            len_cal(row[3:6])
         # angle = angle_cal(row)
         # harvest[int(row[0]), int(row[1])] = angle
 

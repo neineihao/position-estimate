@@ -23,7 +23,7 @@ def test():
 
 def positionDataProcess():
     outdata = {}
-    data = csv2data("result/RSSdata.csv")
+    data = csv2data("RSSdata.csv")
     data = numpy_sort(data, 0)
     row, col = data.shape
     for i in tqdm(range(row),ncols=100, desc="Progress"):
@@ -104,7 +104,7 @@ def draw_distribution(test_time):
         
 if __name__ == '__main__':
     # test()
-    # random_test(10000)
+    random_test(10000)
     positionDataProcess()
     # test_distribution()
     # test_list()

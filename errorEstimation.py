@@ -70,8 +70,8 @@ def estimate_distacne(signal):
 
 def random_test(total_time):
     result = []
-    with open("RSSdata.csv", "w") as dfile:
-        with open("result.csv", "w") as file:
+    with open("result/RSSdata.csv", "w") as dfile:
+        with open("result/result.csv", "w") as file:
             file.write("Origin,Noise\n")
             dfile.write("Distance,OnBx,OnBy,OnBz,OffBx,offBy,offBz\n")
             for i in tqdm(range(total_time), ncols=100, desc="Progress"):

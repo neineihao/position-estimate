@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import random
 from main import gradient_run
+from tqdm import tqdm
 
 STD = 0.1
 
@@ -25,11 +26,10 @@ def test():
     Zstd = zData.std()
     print("STD in X, Y, Z : ({}, {}, {} )".format(Xstd, Ystd, Zstd))
     draw_histogram(zData, xlabel="Signal")
-
     print(np.mean(np.array([Xstd, Ystd, Zstd])))
 
 def getMagFlux():
-    return random.uniform(-80, 80)
+    return random.uniform(-100, 100)
 
 def get3DMag():
     return np.asarray([getMagFlux(), getMagFlux(), getMagFlux()])
@@ -58,6 +58,8 @@ def get_noise_RSS():
     fluxNoiseON = add_noise(fluxON)
     fluxNoiseOFF = add_noise(fluxOFF)
     data['withNoise'] = np.array([[RSS_cal(fluxNoiseON, fluxNoiseOFF)]])
+    data['OnSignal'] = fluxON
+    data['OffSignal'] = fluxOFF
     return data
 
 def estimate_distacne(signal):
@@ -66,28 +68,29 @@ def estimate_distacne(signal):
     position = gradient_run(defaultPosition, signal)
     return position[0]
 
-def random_test():
+def random_test(total_time):
     result = []
-    with open("result.csv", "w") as file:
-        file.write(",Origin,Noise\n")
-        for i in range(100):
-            data = get_noise_RSS()
-            origin = data['origin']
-            withNoise = data['withNoise']
-            distance = round(estimate_distacne(origin), 2)
-            # print("Signal = {}, Result Distance = {}".format(origin[0, 0], distance))
-            distance_with_noise = estimate_distacne(withNoise)
-            # print("Signal with Noise = {}, Result Distance with Noise ={}".format(withNoise[0, 0], distance_with_noise))
-            if distance < 200:
-                file.write("{}, {}\n".format(distance, distance_with_noise))
-
-
-
-
-
-    # print("From range {} to {}".format(result.max(), result.min()))
-    # print("Mean Value: {}".format(result.mean()))
-    # draw_histogram(result, xlabel="distance")
+    with open("RSSdata.csv", "w") as dfile:
+        with open("result.csv", "w") as file:
+            file.write("Origin,Noise\n")
+            dfile.write("Distance,OnBx,OnBy,OnBz,OffBx,offBy,offBz\n")
+            for i in tqdm(range(total_time), ncols=100, desc="Progress"):
+                data = get_noise_RSS()
+                origin = data['origin']
+                withNoise = data['withNoise']
+                distance = round(estimate_distacne(origin), 2)
+                # print("Signal = {}, Result Distance = {}".format(origin[0, 0], distance))
+                distance_with_noise = round(estimate_distacne(withNoise), 4)
+                # print("Signal with Noise = {}, Result Distance with Noise ={}".format(withNoise[0, 0], distance_with_noise))
+                if distance < 200:
+                    result.append(distance)
+                    file.write("{},{}\n".format(distance, distance_with_noise))
+                    dfile.write("{},{},{},{},{},{},{}\n".format(distance,  data['OnSignal'][0], data['OnSignal'][1], data['OnSignal']\
+                    	                                          [2], data['OffSignal'][0], data['OffSignal'][1], data['OffSignal'][2]))
+    result = np.asarray(result)
+    print("From range {} to {}".format(result.max(), result.min()))
+    print("Mean Value: {}".format(result.mean()))
+    draw_histogram(result, xlabel="distance")
 
 
 def draw_histogram(data, xlabel="RSS", ylabel="Times"):
@@ -101,7 +104,7 @@ def draw_histogram(data, xlabel="RSS", ylabel="Times"):
 
 if __name__ == '__main__':
     # test()
-    random_test()
+    random_test(100000)
     # add_noise(get3DMag())
 
 

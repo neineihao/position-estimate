@@ -18,26 +18,33 @@ def test():
 
     for i in range(xData.size):
         print("Actual : {}, WithNoise: {}".format(xData[i], yData[i]))
-    plt.plot(xData, yData, "*")
-    plt.show()
+        plt.plot(xData, yData, "*")
+        plt.show()
 
 def positionDataProcess():
     outdata = {}
-    data = csv2data("RSSdata.csv")
+    data = csv2data("result/RSSdata.csv")
     data = numpy_sort(data, 0)
     row, col = data.shape
     for i in tqdm(range(row),ncols=100, desc="Progress"):
-        on_signal = data[0:3]
-        off_signal = data[3:6]
+        # for i in range(row):
+        # print(data[i,:])
+        on_signal = data[i, 1:4]
+        # print(on_signal)
+        off_signal = data[i, 4:7]
+        # print(off_signal)
         origin = np.array([[RSS_cal(on_signal, off_signal)]])
         origin_result = estimate_distacne(origin)
+        # print("origin data: {}, data: {}".format(origin_result, data[i,0]))
+        # print("abs: {}".format(abs(origin_result - data[i,0])))
         if abs(origin_result - data[i, 0]) < 2:
-            index = str(round(data[i, 0], 1))
+            index = str(round(data[i, 0], 1))    
             if index not in outdata:
                 outdata[index] = []
                 outdata[index].append(data[i, 1::].tolist())
             else:
                 outdata[index].append(data[i, 1::].tolist())
+
 
     for key, value in outdata.items():
         key = key.replace(".", "_")
@@ -74,23 +81,31 @@ def path_file_list(path="positionData"):
     return [f for f in listdir(path) if isfile(join(path, f))]
 
 def draw_distribution(test_time):
-    file_name = "D57_5"
-    data = csv2data("positionData/{}.csv".format(file_name))
-    ideal = processDistance(file_name)
-    row, col = data.shape
-    times = int(test_time / row)
-    result_bucket = []
-    for i in range(times):
-        for item in data:
-            on_signal = item[0:3]
-            off_signal = item[3:6]
-            noise_on_signal = add_noise(on_signal)
-            noise_off_signal = add_noise(off_signal)
-            noise_RSS = np.array([[RSS_cal(noise_on_signal, noise_off_signal)]])
-            noise_result = estimate_distacne(noise_RSS)
-            result_bucket.append(noise_result)
-    result_bucket = np.asarray(result_bucket)
-    draw_histogram(result_bucket, xlabel="Estimated Distance")
+    path_files = path_file_list()
+    with open("DistributionAnalysis.csv", "w") as fi:
+        fi.write("Distance, Means, std\n")
+        for file_index in tqdm(range(len(path_files)), ncols=100, desc="Progress"):
+            # for file_index in tqdm(range(20), ncols=100, desc="Progress"):        
+            # file_name = "D145_1"
+            data = csv2data("positionData/{}".format(path_files[file_index]))
+            ideal = processDistance(path_files[file_index])
+            row, col = data.shape
+            times = int(test_time / row)
+            result_bucket = []
+            # for i in tqdm(range(times),ncols=100, desc="Progress"):
+            for i in range(times):
+                for item in data:
+                    on_signal = item[0:3]
+                    off_signal = item[3:6]
+                    noise_on_signal = add_noise(on_signal)
+                    noise_off_signal = add_noise(off_signal)
+                    noise_RSS = np.array([[RSS_cal(noise_on_signal, noise_off_signal)]])
+                    noise_result = estimate_distacne(noise_RSS)
+                    # print("The result: {}".format(noise_result))
+                    result_bucket.append(noise_result)
+            result_bucket = np.asarray(result_bucket)
+            fi.write("{},{},{}\n".format(ideal, result_bucket.mean(), result_bucket.std()))
+                    # draw_histogram(result_bucket, xlabel="Estimated Distance")
 
         # noise_on_signal = add_noise(on_signal)
         # noise_off_signal = add_noise(off_signal)
@@ -100,12 +115,36 @@ def draw_distribution(test_time):
         # print("Origin : {}, Result: {}".format(origin_result, noise_result))
 
 
+def test_error(test_time):
+    # file_name = "D145_1"
+    test_file = "D50_5"
+    data = csv2data("positionData/{}.csv".format(test_file))
+    ideal = processDistance(test_file)
+    row, col = data.shape
+    print(data.shape)
+    times = int(test_time / row)
+    result_bucket = []
+    # for i in tqdm(range(times),ncols=100, desc="Progress"):
+    for i in range(times):
+        for item in data:
+            on_signal = item[0:3]
+            print(on_signal)
+            off_signal = item[3:6]
+            noise_on_signal = add_noise(on_signal)
+            noise_off_signal = add_noise(off_signal)
+            noise_RSS = np.array([[RSS_cal(noise_on_signal, noise_off_signal)]])
+            noise_result = estimate_distacne(noise_RSS)
+            # print("The result: {}".format(noise_result))
+            result_bucket.append(noise_result)
+            result_bucket = np.asarray(result_bucket)
+    draw_histogram(result_bucket, xlabel="Estimated Distance")
 
         
 if __name__ == '__main__':
     # test()
-    random_test(10000)
-    positionDataProcess()
+    # random_test(10000)
+    # positionDataProcess()
     # test_distribution()
     # test_list()
-    # draw_distribution(10000)
+    draw_distribution(3000)
+

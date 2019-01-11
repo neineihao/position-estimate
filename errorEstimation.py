@@ -82,7 +82,7 @@ def random_test(total_time):
                 # print("Signal = {}, Result Distance = {}".format(origin[0, 0], distance))
                 distance_with_noise = round(estimate_distacne(withNoise), 4)
                 # print("Signal with Noise = {}, Result Distance with Noise ={}".format(withNoise[0, 0], distance_with_noise))
-                if distance < 200:
+                if distance < 200 and distance > 50:
                     result.append(distance)
                     file.write("{},{}\n".format(distance, distance_with_noise))
                     dfile.write("{},{},{},{},{},{},{}\n".format(distance,  data['OnSignal'][0], data['OnSignal'][1], data['OnSignal']\

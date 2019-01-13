@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import random
 
 A = np.array([[1 / 16], [1 / 16], [1 / 25]])
-C = 285692.36935118
+C = 285692.36935118 * 1.2
 
 def gradient_run(position, signal, color='b', label='test', alpha=0.01, times=500, plot=False):
     cost_buckets = np.ones(times)

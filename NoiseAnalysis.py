@@ -191,6 +191,16 @@ def get_median(a):
     a.sort()
     return a[int(size/2)]
 
+def test_actual():
+    data = csv2data("actual.csv")
+    data = numpy_sort(data, 0)
+    for item in data:
+        print(item)
+        on_signal = item[1:4]
+        off_signal = item[4:7]
+        RSS = np.array([[RSS_cal(on_signal, off_signal)]])
+        distance_data = estimate_distacne(RSS)
+        print(distance_data)
 
         
 if __name__ == '__main__':
@@ -199,8 +209,8 @@ if __name__ == '__main__':
     # positionDataProcess()
     # test_distribution()
     # test_list()
-    draw_distribution(1000)
+    # draw_distribution(1000)
     # test_error2(10000)
     # test_data()
-    
+    test_actual()
     

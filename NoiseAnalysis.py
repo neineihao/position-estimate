@@ -6,7 +6,7 @@ from os import listdir
 from os.path import isfile, join
 from tqdm import tqdm
 
-STD = 0.1
+
 def numpy_sort(np_array, arg):
     return np_array[np_array[:, arg].argsort()]
 
@@ -30,9 +30,7 @@ def positionDataProcess():
         # for i in range(row):
         # print(data[i,:])
         on_signal = data[i, 1:4]
-        # print(on_signal)
         off_signal = data[i, 4:7]
-        # print(off_signal)
         origin = np.array([[RSS_cal(on_signal, off_signal)]])
         origin_result = estimate_distacne(origin)
         # print("origin data: {}, data: {}".format(origin_result, data[i,0]))
@@ -83,28 +81,28 @@ def path_file_list(path="positionData"):
 def draw_distribution(test_time):
     path_files = path_file_list()
     with open("DistributionAnalysis.csv", "w") as fi:
-        fi.write("Distance, Means, std\n")
+        fi.write("Distance, Means, std, median\n")
         for file_index in tqdm(range(len(path_files)), ncols=100, desc="Progress"):
             # for file_index in tqdm(range(20), ncols=100, desc="Progress"):        
             # file_name = "D145_1"
             data = csv2data("positionData/{}".format(path_files[file_index]))
             ideal = processDistance(path_files[file_index])
             row, col = data.shape
-            times = int(test_time / row)
+            # times = int(test_time / row)
             result_bucket = []
             # for i in tqdm(range(times),ncols=100, desc="Progress"):
-            for i in range(times):
-                for item in data:
-                    on_signal = item[0:3]
-                    off_signal = item[3:6]
-                    noise_on_signal = add_noise(on_signal)
-                    noise_off_signal = add_noise(off_signal)
-                    noise_RSS = np.array([[RSS_cal(noise_on_signal, noise_off_signal)]])
-                    noise_result = estimate_distacne(noise_RSS)
-                    # print("The result: {}".format(noise_result))
-                    result_bucket.append(noise_result)
+            item = data[0,:]
+            for i in range(test_time):
+                on_signal = item[0:3]
+                off_signal = item[3:6]
+                noise_on_signal = add_noise(on_signal)
+                noise_off_signal = add_noise(off_signal)
+                noise_RSS = np.array([[RSS_cal(noise_on_signal, noise_off_signal)]])
+                noise_result = estimate_distacne(noise_RSS)
+                # print("The result: {}".format(noise_result))
+                result_bucket.append(noise_result)
             result_bucket = np.asarray(result_bucket)
-            fi.write("{},{},{}\n".format(ideal, result_bucket.mean(), result_bucket.std()))
+            fi.write("{},{},{},{}\n".format(ideal, result_bucket.mean(), result_bucket.std(), get_median(result_bucket)))
                     # draw_histogram(result_bucket, xlabel="Estimated Distance")
 
         # noise_on_signal = add_noise(on_signal)
@@ -123,9 +121,36 @@ def test_error(test_time):
     row, col = data.shape
     print(data.shape)
     times = int(test_time / row)
+    times = test_time
     result_bucket = []
     # for i in tqdm(range(times),ncols=100, desc="Progress"):
-    for i in range(times):
+    item = data[0,:]
+    for i in tqdm(range(times)):        
+        on_signal = item[0:3]
+        off_signal = item[3:6]
+        noise_on_signal = add_noise(on_signal)
+        noise_off_signal = add_noise(off_signal)
+        noise_RSS = np.array([[RSS_cal(noise_on_signal, noise_off_signal)]])
+        noise_result = estimate_distacne(noise_RSS)
+        # print(noise_result)
+        # print("The result: {}".format(noise_result))
+        result_bucket.append(noise_result)
+    result_bucket = np.asarray(result_bucket)
+    print(result_bucket.size)
+    print(get_median(result_bucket))
+    draw_histogram(result_bucket, xlabel="Estimated Distance")
+
+
+def test_error2(test_time):
+    test_file = "D50_5"
+    data = csv2data("positionData/{}.csv".format(test_file))
+    ideal = processDistance(test_file)
+    row, col = data.shape
+    print(data.shape)
+    times = int(test_time / row)
+    result_bucket = []
+    for i in tqdm(range(times),ncols=100, desc="Progress"):
+    # item = data[0,:]
         for item in data:
             on_signal = item[0:3]
             off_signal = item[3:6]
@@ -133,20 +158,49 @@ def test_error(test_time):
             noise_off_signal = add_noise(off_signal)
             noise_RSS = np.array([[RSS_cal(noise_on_signal, noise_off_signal)]])
             noise_result = estimate_distacne(noise_RSS)
-            print(noise_result)
-            # print("The result: {}".format(noise_result))
             result_bucket.append(noise_result)
+        # print(noise_result)
+        # print("The result: {}".format(noise_result))
     result_bucket = np.asarray(result_bucket)
+    print(result_bucket.size)
+    print(get_median(result_bucket))
     draw_histogram(result_bucket, xlabel="Estimated Distance")
 
+    
+def test_data():
+    test_file = "D50_5"
+    data = csv2data("positionData/{}.csv".format(test_file))
+    ideal = processDistance(test_file)
+    result_bucket = []
+    row, col = data.shape
+    # for i in tqdm(range(row)):
+    for item in data:
+        on_signal = item[0:3]
+        off_signal = item[3:6]
+        RSS = np.array([[RSS_cal(on_signal, off_signal)]])
+        distance_data = estimate_distacne(RSS)
+        result_bucket.append(distance_data)
+    result_bucket = np.asarray(result_bucket)
+    x_data = np.zeros(row)
+    x_data = x_data + ideal
+    plt.plot(x_data, result_bucket, "o")
+    plt.show()
+    
+def get_median(a):
+    size = a.size
+    a.sort()
+    return a[int(size/2)]
 
 
         
 if __name__ == '__main__':
     # test()
-    # random_test(10000)
+    # random_test(30000)
     # positionDataProcess()
     # test_distribution()
     # test_list()
-    # draw_distribution(3000)
-    test_error(1000)
+    draw_distribution(1000)
+    # test_error2(10000)
+    # test_data()
+    
+    

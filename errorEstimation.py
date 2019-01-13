@@ -5,7 +5,7 @@ import random
 from main import gradient_run
 from tqdm import tqdm
 
-STD = 0.1
+STD = 0.025
 
 
 def csv2data(filename='distribution0.csv'):
@@ -70,8 +70,8 @@ def estimate_distacne(signal):
 
 def random_test(total_time):
     result = []
-    with open("result/RSSdata.csv", "w") as dfile:
-        with open("result/result.csv", "w") as file:
+    with open("result/RSSdata.csv", "a") as dfile:
+        with open("result/result.csv", "a") as file:
             file.write("Origin,Noise\n")
             dfile.write("Distance,OnBx,OnBy,OnBz,OffBx,offBy,offBz\n")
             for i in tqdm(range(total_time), ncols=100, desc="Progress"):

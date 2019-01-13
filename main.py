@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
+import random
 
 A = np.array([[1 / 16], [1 / 16], [1 / 25]])
 C = 285692.36935118
@@ -12,6 +12,7 @@ def gradient_run(position, signal, color='b', label='test', alpha=0.01, times=50
     # talpha = alpha / row
     talpha = alpha
     # initial for the estimation result
+    point = np.array([float(random.randrange(30,50)), 0.0, 0.0])
     point = np.array([50.0, 0.0, 0.0])
     for i in range(times):
         # initial the obj for every iteration

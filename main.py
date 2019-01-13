@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 A = np.array([[1 / 16], [1 / 16], [1 / 25]])
 C = 285692.36935118
 
-def gradient_run(position, signal, color='b', label='test', alpha=0.01, times=1000, plot=False):
+def gradient_run(position, signal, color='b', label='test', alpha=0.01, times=500, plot=False):
     cost_buckets = np.ones(times)
     x = np.ones(times)
     row, col = np.shape(position)

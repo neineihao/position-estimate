@@ -128,16 +128,18 @@ def test_error(test_time):
     for i in range(times):
         for item in data:
             on_signal = item[0:3]
-            print(on_signal)
             off_signal = item[3:6]
             noise_on_signal = add_noise(on_signal)
             noise_off_signal = add_noise(off_signal)
             noise_RSS = np.array([[RSS_cal(noise_on_signal, noise_off_signal)]])
             noise_result = estimate_distacne(noise_RSS)
+            print(noise_result)
             # print("The result: {}".format(noise_result))
             result_bucket.append(noise_result)
-            result_bucket = np.asarray(result_bucket)
+    result_bucket = np.asarray(result_bucket)
     draw_histogram(result_bucket, xlabel="Estimated Distance")
+
+
 
         
 if __name__ == '__main__':
@@ -146,5 +148,5 @@ if __name__ == '__main__':
     # positionDataProcess()
     # test_distribution()
     # test_list()
-    draw_distribution(3000)
-
+    # draw_distribution(3000)
+    test_error(1000)

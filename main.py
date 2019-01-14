@@ -5,23 +5,26 @@ import random
 A = np.array([[1 / 16], [1 / 16], [1 / 25]])
 C = 285692.36935118 * 1.2
 
-def gradient_run(position, signal, color='b', label='test', alpha=0.01, times=500, plot=False):
+def gradient_run(position, signal, color='b', label='test', alpha=0.035, times=2000, plot=False):
     cost_buckets = np.ones(times)
     x = np.ones(times)
     row, col = np.shape(position)
     # talpha = alpha / row
     talpha = alpha
     # initial for the estimation result
-    point = np.array([float(random.randrange(30,50)), 0.0, 0.0])
+    #point = np.array([float(random.randrange(30,50)), 0.0, 0.0])
     point = np.array([50.0, 0.0, 0.0])
     for i in range(times):
+        if (i % 150 == 0):
+            talpha *= 0.999
+            # print("alpha = {}".format(talpha))
         # initial the obj for every iteration
         obj = 0
         for j in range(row):
             cal_result = calculate(point, position[j, :], signal[j])
             obj += cal_result['obj']
             point -= talpha * cal_result['grad']
-        # print("The cost in iteration {} : {}".format(i, obj[0]))
+            # print("The cost in iteration {} : {}".format(i, obj[0]))
         cost_buckets[i] = obj[0]
         x[i] = i
     # print("The point (x, y, z): {}, {}, {}".format(point[0], point[1], point[2]))
@@ -30,6 +33,11 @@ def gradient_run(position, signal, color='b', label='test', alpha=0.01, times=50
     if plot:
         plt.plot(x, cost_buckets, "{}".format(color), label="alpha = {} / N".format(alpha))
     return point
+
+def cal_distance_simple(signal):
+    C2 = C
+    return (signal[0][0] / C) ** (-1/3) * 4
+
 
 
 def calculate(cal, position, signal):
@@ -43,15 +51,16 @@ def calculate(cal, position, signal):
     return r_dic
 
 def test():
-    a = np.array([2, 4, 4])
-    b = np.array([1/2, 1/4, 1/4])
-    print(np.dot(a, b))
+    Bon = np.array([-83.21020892094641,25.718123139919186,37.205606487860564])
+    Bof = np.array([-67.21096189104361,-75.08323128743994,-13.733680850750616])
+    
 
-def test_for_distance():
+
+def test_for_distance(signal):
     position = np.array([[0,0,0]])
-    signal = np.array([[18.803]])
     result = gradient_run(position, signal, 'b', 'test', alpha=0.001)
     print(result[0])
+
 
 
 if __name__ == '__main__':
@@ -67,7 +76,10 @@ if __name__ == '__main__':
     """
     # position = np.array([[50.0, 10.0, 20.0]])
     # signal = np.array([[35.401]])
-    test_for_distance()
+    # test_for_distance()
+    signal = np.array([[18.803]])
+    test_for_distance(signal)
+    print(cal_distance_simple(signal))
     # position = np.array([[0.0, 0.0, 0.0],[72.6, 0.0, 0.0], [35.829, 49.961, 0.0]])
     # signal = np.array([[19.615],[19.79],[21.27]])
     # gradient_run(position, signal, 'b', 'test', alpha=0.001)

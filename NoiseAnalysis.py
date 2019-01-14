@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from errorEstimation import csv2data, add_noise, RSS_cal, estimate_distacne, random_test, draw_histogram
+from errorEstimation import csv2data, add_noise, RSS_cal, estimate_distacne, random_test, draw_histogram, generate_data
+from main import cal_distance_simple
 from os import listdir
 from os.path import isfile, join
 from tqdm import tqdm
@@ -21,28 +22,61 @@ def test():
         plt.plot(xData, yData, "*")
         plt.show()
 
+
+def nonRandomDataProcess():
+    outdata = {}
+    data = csv2data("result/RSSdata.csv")
+    data = numpy_sort(data, 0)
+    row, col = data.shape
+    
+    for i in tqdm(range(row),ncols=100, desc="Progress"):
+        on_signal = data[i, 1:4]
+        off_signal = data[i, 4:7]
+        origin = np.array([[RSS_cal(on_signal, off_signal)]])
+        origin_result = cal_distance_simple(origin)
+        index = str(round(data[i, 0], 1))
+        if index not in outdata:
+            outdata[index] = []
+            outdata[index].append(data[i, 1::].tolist())
+        else:
+            outdata[index].append(data[i, 1::].tolist())
+
+    for key, value in outdata.items():
+        key = key.replace(".", "_")
+        with open("positionData/D{}.csv".format(key), "w") as f:
+            f.write("Bxon,Byon,Bzon,Bxoff,Byoff,Bzoff\n")
+            for item in value:
+                f.write("{},{},{},{},{},{}\n".format(item[0], item[1], item[2], item[3], item[4], item[5]))
+
+        
 def positionDataProcess():
     outdata = {}
     data = csv2data("result/RSSdata.csv")
     data = numpy_sort(data, 0)
     row, col = data.shape
-    for i in tqdm(range(row),ncols=100, desc="Progress"):
-        # for i in range(row):
-        # print(data[i,:])
-        on_signal = data[i, 1:4]
-        off_signal = data[i, 4:7]
-        origin = np.array([[RSS_cal(on_signal, off_signal)]])
-        origin_result = estimate_distacne(origin)
-        # print("origin data: {}, data: {}".format(origin_result, data[i,0]))
-        # print("abs: {}".format(abs(origin_result - data[i,0])))
-        if abs(origin_result - data[i, 0]) < 2:
-            index = str(round(data[i, 0], 1))    
-            if index not in outdata:
-                outdata[index] = []
-                outdata[index].append(data[i, 1::].tolist())
-            else:
-                outdata[index].append(data[i, 1::].tolist())
-
+    with open("observe.csv", "w") as ob:
+        for i in tqdm(range(row),ncols=100, desc="Progress"):
+            # for i in range(row):
+            # for i in range(row):
+            # print(data[i,:])
+            on_signal = data[i, 1:4]
+            off_signal = data[i, 4:7]
+            origin = np.array([[RSS_cal(on_signal, off_signal)]])
+            origin_result = estimate_distacne(origin)
+            # print("origin data: {}, data: {}".format(origin_result, data[i,0]))
+            # print("abs: {}".format(abs(origin_result - data[i,0])))
+            flag = abs(origin_result - data[i, 0])
+            if flag < 1:
+                # print("origin data: {}, data: {}".format(origin_result, data[i,0]))
+                # print("abs: {}".format(abs(origin_result - data[i,0])))
+                index = str(round(data[i, 0], 1))    
+                ob.write("{},{},{},{}\n".format(index, origin_result, data[i,0], flag))
+                ob.write("{}\n".format(data[i, 1::]))
+                if index not in outdata:
+                    outdata[index] = []
+                    outdata[index].append(data[i, 1::].tolist())
+                else:
+                    outdata[index].append(data[i, 1::].tolist())
 
     for key, value in outdata.items():
         key = key.replace(".", "_")
@@ -78,7 +112,35 @@ def test_distribution():
 def path_file_list(path="positionData"):    
     return [f for f in listdir(path) if isfile(join(path, f))]
 
-def draw_distribution(test_time):
+# def draw_distribution(test_time, cal_function):
+#     path_files = path_file_list()
+#     with open("DistributionAnalysis.csv", "w") as fi:
+#         fi.write("Distance, Means, std, median\n")
+#         for file_index in tqdm(range(len(path_files)), ncols=100, desc="Progress"):
+#             # for file_index in tqdm(range(20), ncols=100, desc="Progress"):        
+#             # file_name = "D145_1"
+#             data = csv2data("positionData/{}".format(path_files[file_index]))
+#             ideal = processDistance(path_files[file_index])
+#             row, col = data.shape
+#             # times = int(test_time / row)
+#             result_bucket = []
+#             # for i in tqdm(range(times),ncols=100, desc="Progress"):
+#             item = data[0,:]
+#             for i in range(test_time):
+#                 on_signal = item[0:3]
+#                 off_signal = item[3:6]
+#                 noise_on_signal = add_noise(on_signal)
+#                 noise_off_signal = add_noise(off_signal)
+#                 noise_RSS = np.array([[RSS_cal(noise_on_signal, noise_off_signal)]])
+#                 noise_result = cal_function(noise_RSS)
+#                 # print("The result: {}".format(noise_result))
+#                 result_bucket.append(noise_result)
+#             result_bucket = np.asarray(result_bucket)
+#             fi.write("{},{},{},{}\n".format(ideal, result_bucket.mean(), result_bucket.std(), get_median(result_bucket)))
+
+
+
+def nonRandom_distribution(test_times, cal_function):
     path_files = path_file_list()
     with open("DistributionAnalysis.csv", "w") as fi:
         fi.write("Distance, Means, std, median\n")
@@ -92,30 +154,36 @@ def draw_distribution(test_time):
             result_bucket = []
             # for i in tqdm(range(times),ncols=100, desc="Progress"):
             item = data[0,:]
-            for i in range(test_time):
+            for i in range(test_times):
                 on_signal = item[0:3]
                 off_signal = item[3:6]
                 noise_on_signal = add_noise(on_signal)
                 noise_off_signal = add_noise(off_signal)
                 noise_RSS = np.array([[RSS_cal(noise_on_signal, noise_off_signal)]])
-                noise_result = estimate_distacne(noise_RSS)
+                noise_result = cal_function(noise_RSS)
                 # print("The result: {}".format(noise_result))
                 result_bucket.append(noise_result)
             result_bucket = np.asarray(result_bucket)
             fi.write("{},{},{},{}\n".format(ideal, result_bucket.mean(), result_bucket.std(), get_median(result_bucket)))
-                    # draw_histogram(result_bucket, xlabel="Estimated Distance")
 
-        # noise_on_signal = add_noise(on_signal)
-        # noise_off_signal = add_noise(off_signal)
-        # noise_RSS = np.array([[RSS_cal(noise_on_signal, noise_off_signal)]])
 
-        # noise_result = estimate_distacne(noise_RSS)
-        # print("Origin : {}, Result: {}".format(origin_result, noise_result))
 
+
+            
+def see_origin_distance(filename):
+    data = csv2data("positionData/{}.csv".format(filename))
+    ideal = processDistance(filename)
+    item = data[0,:]
+    on_signal = item[0:3]
+    off_signal = item[3:6]
+    RSS = np.array([[RSS_cal(on_signal, off_signal)]])
+    result = estimate_distacne(RSS, alpha=0.001, times=1000)
+    print(result)
+    
 
 def test_error(test_time):
     # file_name = "D145_1"
-    test_file = "D50_5"
+    test_file = "D51_4"
     data = csv2data("positionData/{}.csv".format(test_file))
     ideal = processDistance(test_file)
     row, col = data.shape
@@ -191,26 +259,25 @@ def get_median(a):
     a.sort()
     return a[int(size/2)]
 
-def test_actual():
-    data = csv2data("actual.csv")
+def test_actual(filename):
+    data = csv2data("positionData/{}.csv".format(filename))
     data = numpy_sort(data, 0)
     for item in data:
         print(item)
-        on_signal = item[1:4]
-        off_signal = item[4:7]
+        on_signal = item[0:3]
+        off_signal = item[3:6]
         RSS = np.array([[RSS_cal(on_signal, off_signal)]])
-        distance_data = estimate_distacne(RSS)
+        print(RSS)
+        distance_data = estimate_distacne(RSS,alpha=0.0001,times=1000)
         print(distance_data)
 
         
 if __name__ == '__main__':
     # test()
-    # random_test(30000)
+    # random_test(1000)
+    # generate_data(10000)    
     # positionDataProcess()
-    # test_distribution()
-    # test_list()
-    # draw_distribution(1000)
-    # test_error2(10000)
-    # test_data()
-    test_actual()
+    # nonRandomDataProcess()
+    nonRandom_distribution(10000, cal_distance_simple)
+    # draw_distribution(5000)
     

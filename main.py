@@ -17,9 +17,8 @@ def gradient_run(position, signal, color='b', label='test', alpha=0.04, times=15
     #point = np.array([float(random.randrange(30,50)), 0.0, 0.0])
     point = np.array([50.0, 0.0, 0.0])
     for i in range(times):
-        if (i % 100 == 0):
-            talpha *= 0.9
-            # print("alpha = {}".format(talpha))
+    #     if (i % 100 == 0):
+    #         talpha *= 0.9
     # initial the obj for every iteration
         obj = 0
         for j in range(row):
@@ -31,9 +30,10 @@ def gradient_run(position, signal, color='b', label='test', alpha=0.04, times=15
         x[i] = i
     # print("The point (x, y, z): {}, {}, {}".format(point[0], point[1], point[2]))
     # print("End for the alpha = {} / N, and the cost is {}".format(alpha, obj[0]))
-    # print("cost: {}".format(obj[0]))
+    print("cost: {}".format(obj[0]))
     if plot:
-        plt.plot(x, cost_buckets, "{}".format(color), label="alpha = {} / N".format(alpha))
+        plt.semilogy(x, cost_buckets, "{}".format(color), label="alpha = {}".format(alpha))
+
     return point
 
 def cal_distance_simple(signal):
@@ -64,9 +64,25 @@ def RSS_cal(a, b):
 
 
 def test_for_distance(signal):
-    position = np.array([[0,0,0]])
-    result = gradient_run(position, signal)
+    position = np.array([[0, 0, 0]])
+    result = gradient_run(position, signal, plot=True, alpha=0.01)
     print(result[0])
+
+def test_for_learning_rate(signal):
+    tuple_list = [(0.1, 'b'), (0.05, 'g'), (0.03, 'r'), (0.01, 'c'), (0.005, 'm'), (0.001, 'k')]
+    # tuple_list = [(0.05, 'g'), (0.01, 'c')]
+    for item in tuple_list:
+        position = np.array([[0, 0, 0]])
+        result = gradient_run(position, signal, alpha=item[0], plot=True, color=item[1], times=1000)
+        print("With learning rate: {}, Distance: {}".format(item[0] ,result[0]))
+    plt.xlabel('Iteration (#)', fontsize=18)
+    plt.ylabel('Cost', fontsize=18)
+    plt.legend(fontsize=12)
+    plt.show()
+    plt.show()
+
+
+
 
 
 def test_file(filename):
@@ -91,7 +107,17 @@ if __name__ == '__main__':
         'k'	black
         'w'	white
     """
-    test_file("D114_3")
+    mid_signal = np.array([[14.6845]])
+    min_signal = np.array([[2.6762838290476405]])
+    max_signal = np.array([[150.56598649060965]])
+    # test_for_distance(max_signal)
+    # test_for_distance(min_signal)
+    # test_for_learning_rate(min_signal)
+    test_for_learning_rate(min_signal)
+    # test_for_distance(max_signal)
+    # test_for_distance(min_signal)
+    # plt.show()
+    # test_file("D114_3")
     # position = np.array([[50.0, 10.0, 20.0]])
     # signal = np.array([[35.401]])
     # test_for_distance()

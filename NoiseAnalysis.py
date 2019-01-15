@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from errorEstimation import csv2data, add_noise, RSS_cal, estimate_distacne, random_test, draw_histogram, generate_data
+from errorEstimation import csv2data, add_noise, RSS_cal, estimate_distacne, draw_histogram, generate_data
 from main import cal_distance_simple
 from os import listdir
 from os.path import isfile, join
@@ -112,34 +112,6 @@ def test_distribution():
 def path_file_list(path="positionData"):    
     return [f for f in listdir(path) if isfile(join(path, f))]
 
-# def draw_distribution(test_time, cal_function):
-#     path_files = path_file_list()
-#     with open("DistributionAnalysis.csv", "w") as fi:
-#         fi.write("Distance, Means, std, median\n")
-#         for file_index in tqdm(range(len(path_files)), ncols=100, desc="Progress"):
-#             # for file_index in tqdm(range(20), ncols=100, desc="Progress"):        
-#             # file_name = "D145_1"
-#             data = csv2data("positionData/{}".format(path_files[file_index]))
-#             ideal = processDistance(path_files[file_index])
-#             row, col = data.shape
-#             # times = int(test_time / row)
-#             result_bucket = []
-#             # for i in tqdm(range(times),ncols=100, desc="Progress"):
-#             item = data[0,:]
-#             for i in range(test_time):
-#                 on_signal = item[0:3]
-#                 off_signal = item[3:6]
-#                 noise_on_signal = add_noise(on_signal)
-#                 noise_off_signal = add_noise(off_signal)
-#                 noise_RSS = np.array([[RSS_cal(noise_on_signal, noise_off_signal)]])
-#                 noise_result = cal_function(noise_RSS)
-#                 # print("The result: {}".format(noise_result))
-#                 result_bucket.append(noise_result)
-#             result_bucket = np.asarray(result_bucket)
-#             fi.write("{},{},{},{}\n".format(ideal, result_bucket.mean(), result_bucket.std(), get_median(result_bucket)))
-
-
-
 def cal_distribution(test_times, cal_function, write_file="DistributionAnalysis.csv"):
     path_files = path_file_list()
     with open(write_file, "w") as fi:
@@ -148,6 +120,8 @@ def cal_distribution(test_times, cal_function, write_file="DistributionAnalysis.
             # for file_index in tqdm(range(20), ncols=100, desc="Progress"):        
             # file_name = "D145_1"
             data = csv2data("positionData/{}".format(path_files[file_index]))
+            # print("file: {}".format(path_files[file_index]))
+            # print("file: {}".format(path_files[file_index]))
             ideal = processDistance(path_files[file_index])
             row, col = data.shape
             # times = int(test_time / row)
@@ -166,10 +140,6 @@ def cal_distribution(test_times, cal_function, write_file="DistributionAnalysis.
             result_bucket = np.asarray(result_bucket)
             fi.write("{},{},{},{}\n".format(ideal, result_bucket.mean(), result_bucket.std(), get_median(result_bucket)))
 
-
-
-
-            
 def see_origin_distance(filename):
     data = csv2data("positionData/{}.csv".format(filename))
     ideal = processDistance(filename)
@@ -268,7 +238,7 @@ def test_actual(filename):
         off_signal = item[3:6]
         RSS = np.array([[RSS_cal(on_signal, off_signal)]])
         print(RSS)
-        distance_data = estimate_distacne(RSS,alpha=0.0001,times=1000)
+        distance_data = estimate_distacne(RSS)
         print(distance_data)
 
         

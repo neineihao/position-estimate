@@ -140,9 +140,9 @@ def path_file_list(path="positionData"):
 
 
 
-def nonRandom_distribution(test_times, cal_function):
+def cal_distribution(test_times, cal_function, write_file="DistributionAnalysis.csv"):
     path_files = path_file_list()
-    with open("DistributionAnalysis.csv", "w") as fi:
+    with open(write_file, "w") as fi:
         fi.write("Distance, Means, std, median\n")
         for file_index in tqdm(range(len(path_files)), ncols=100, desc="Progress"):
             # for file_index in tqdm(range(20), ncols=100, desc="Progress"):        
@@ -278,6 +278,7 @@ if __name__ == '__main__':
     # generate_data(10000)    
     # positionDataProcess()
     # nonRandomDataProcess()
-    nonRandom_distribution(10000, cal_distance_simple)
+    # cal_distribution(10000, cal_distance_simple)
+    cal_distribution(1000, estimate_distacne, write_file="GradResult.csv")
     # draw_distribution(5000)
     

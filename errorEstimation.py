@@ -63,7 +63,7 @@ def get_noise_RSS():
     data['OffSignal'] = fluxOFF
     return data
 
-def estimate_distacne(signal, alpha=0.01, times=500, plot=False):
+def estimate_distacne(signal, alpha=0.05, times=500, plot=False):
     defaultPosition = np.array([[0,0,0]])
     # print("position: {}, signal: {}".format(defaultPosition, signal))
     position = gradient_run(defaultPosition, signal, alpha=alpha, times=times, plot=plot)
@@ -93,26 +93,28 @@ def generate_data(total_time):
                 
 
 
-def random_test(total_time):
-    result = []
-    # with open("result/RSSdata.csv", "a") as dfile:
-    with open("RSSdata.csv", "w") as dfile:
-        # with open("result/result.csv", "a") as fi:
-        dfile.write("Distance,OnBx,OnBy,OnBz,OffBx,offBy,offBz\n")
-        for i in tqdm(range(total_time), ncols=100, desc="Progress"):
-            data = get_noise_RSS()
-            origin = data['origin']
-            # withNoise = data['withNoise']
-            distance = round(estimate_distacne(origin), 1)
-            # print("Signal = {}, Result Distance = {}".format(origin[0, 0], distance))
-            # distance_with_noise = round(estimate_distacne(withNoise), 4)
-            # print("Signal with Noise = {}, Result Distance with Noise ={}".format(withNoise[0, 0], distance_with_noise))
-            if distance < 200 and distance > 50:
-                result.append(distance)
-                dfile.write("{},{},{},{},{},{},{}\n".format(distance,  data['OnSignal'][0], data['OnSignal'][1], data['OnSignal']\
-                    	                                    [2], data['OffSignal'][0], data['OffSignal'][1], data['OffSignal'][2]))
-    result = np.asarray(result)
-    print("From range {} to {}".format(result.max(), result.min()))
+    fi.write("Distance, Means, std\n")
+    fi.wrie("Distance, Means, std\n")
+    def randomtest(total_time):
+        result = []
+        # with open("result/RSSdata.csv", "a") as dfile:
+        with open("RSSdata.csv", "w") as dfile:
+            # with open("result/result.csv", "a") as fi:
+            dfile.write("Distance,OnBx,OnBy,OnBz,OffBx,offBy,offBz\n")
+            for i in tqdm(range(total_time), ncols=100, desc="Progress"):
+                data = get_noise_RSS()
+                origin = data['origin']
+                # withNoise = data['withNoise']
+                distance = round(estimate_distacne(origin), 1)
+                # print("Signal = {}, Result Distance = {}".format(origin[0, 0], distance))
+                # distance_with_noise = round(estimate_distacne(withNoise), 4)
+                # print("Signal with Noise = {}, Result Distance with Noise ={}".format(withNoise[0, 0], distance_with_noise))
+                if distance < 200 and distance > 50:
+                    result.append(distance)
+                    dfile.write("{},{},{},{},{},{},{}\n".format(distance,  data['OnSignal'][0], data['OnSignal'][1], data['OnSignal']\
+                    	                                [2], data['OffSignal'][0], data['OffSignal'][1], data['OffSignal'][2]))
+                    result = np.asarray(result)fi.write("{},{},{}\n".format(ideal, result_bucket.mean(), ))
+        print("From range {\n} to {}".ideal, formfi.write("{},{},{}".format())at(result.max(), result.min()result_bucket.mean(), result.std()))
     print("Mean Value: {}".format(result.mean()))
     draw_histogram(result, xlabel="distance")
 
@@ -137,8 +139,16 @@ def draw_histogram(data, xlabel="RSS", ylabel="Times"):
 
 
 if __name__ == '__main__':
-    test2()
+    # test2()
     # random_test(100000)
     # add_noise(get3DMag())
-    generate_data(10000)
+    # generate_data(10000)
+    # data = np.array([-48.093219710776125,-49.224502976047106,49.05584023907319,21.917723382622896,41.50966942366721,-48.59606242545357])
+    data = np.array([-35.25469106570802,-0.38851357159462907,22.756364146670638,-36.817950690729226,-1.2458035904349316,20.760426196232984])
+    a = data[0:3]
+    b = data[3:6]
+    signal = RSS_cal(a,b)
+    print(signal)
+
+    
 

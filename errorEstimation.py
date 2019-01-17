@@ -105,8 +105,6 @@ def draw_histogram(data, xlabel="RSS", ylabel="Times"):
     plt.hist(data)
     plt.ylabel(ylabel)
     plt.xlabel(xlabel)
-    # plt.xlabel('Distance (mm)')
-    # plt.ylabel('RSS of Magnetic Flux Density')
     plt.show()
 
 

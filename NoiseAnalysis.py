@@ -147,7 +147,7 @@ def see_origin_distance(filename):
     on_signal = item[0:3]
     off_signal = item[3:6]
     RSS = np.array([[RSS_cal(on_signal, off_signal)]])
-    result = estimate_distacne(RSS, alpha=0.001, times=1000)
+    result = estimate_distacne(RSS)
     print(result)
     
 

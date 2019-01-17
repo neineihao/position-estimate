@@ -248,7 +248,7 @@ if __name__ == '__main__':
     # generate_data(10000)    
     # positionDataProcess()
     # nonRandomDataProcess()
-    # cal_distribution(10000, cal_distance_simple)
-    cal_distribution(1000, estimate_distacne, write_file="GradResult.csv")
+    cal_distribution(3000, cal_distance_simple, write_file="Average1.csv")
+    # cal_distribution(1000, estimate_distacne, write_file="GradResult.csv")
     # draw_distribution(5000)
     

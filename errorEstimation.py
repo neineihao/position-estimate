@@ -42,7 +42,7 @@ def add_noise(flux):
     """
     noise_flux = np.zeros(flux.shape[0])
     for index, item in enumerate(flux):
-        noise_flux[index] = random.gauss(item, STD)
+        noise_flux[index] = random.gauss(item, STD / (1 ** 0.5))
     return noise_flux
 
 def getRSS():

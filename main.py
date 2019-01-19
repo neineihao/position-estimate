@@ -29,9 +29,6 @@ def gradient_run(position, signal, decay_rate=0.9, label='test', alpha=0.04, tim
         cost_buckets[i] = obj
         x[i] = i
     # print("The point (x, y, z): {}, {}, {}".format(point[0], point[1], point[2]))
-
-    # print("End for the alpha = {} / N, and the cost is {}".format(alpha, obj[0]))
-    # print("cost: {}".format(obj[0]))
     # print("End for the alpha = {} / N, and the cost is {}".format(alpha, obj))
     print("cost: {}".format(obj))
     if plot:

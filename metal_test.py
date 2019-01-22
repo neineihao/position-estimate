@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
+from plot_setting import plot
 
 
 
@@ -35,6 +36,7 @@ def main():
 def np_sort(a):
     return a[a[:, 2].argsort()]
 
+@plot(xl="Distance (mm)", yl="RSS of Magnetic Flux Density (mT)")
 def test():
     data = csv2data()
     row, col = data.shape
@@ -42,15 +44,15 @@ def test():
     len_result = np.zeros(row)
     angle_result = np.zeros(row)
     for i in range(row):
-        # len_result[i] = len_cal(data[i,3:6])
-        angle_result[i] = angle_cal(data[i,:])
-    # plt.plot(distance, len_result)
-    plt.plot(distance, angle_result)
-    plt.ylabel("Rotation (radian)")
-    plt.xlabel("Distance (mm)")
+        len_result[i] = len_cal(data[i,3:6])
+        # angle_result[i] = angle_cal(data[i,:])
+    plt.plot(distance, len_result)
+    # plt.plot(distance, angle_result)
+    # plt.ylabel("Rotation (radian)")
+    # plt.xlabel("Distance (mm)")
     # plt.xlabel('Distance (mm)')
     # plt.ylabel('RSS of Magnetic Flux Density')
-    plt.show()
+    # plt.show()
 
 def len_cal(data):
     return  (data[0] ** 2 + data[1] ** 2 + data[2] ** 2) ** 0.5

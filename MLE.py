@@ -1,10 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from main import RSS_cal
+from plot_setting import plot
 
 C = 285692.36935118 * 1.2
 
-def position_calculation(signal, position, times=1000, alpha=0.001, plot=True, color='b'):
+def MLE_calculation(position ,signal, times=100, alpha=0.00001, plot=False, color='b'):
     cost_buckets = np.ones(times)
     x = np.ones(times)
     row, col = np.shape(position)
@@ -18,17 +19,14 @@ def position_calculation(signal, position, times=1000, alpha=0.001, plot=True, c
         # initial the obj for every iteration
         obj = 0
         for j in range(row):
-            # print(position[1,:])
-            # print("mu: {}".format(mu[0]))
-            # print("sigma: {}".format(sigma[0]))
             cal_result = cal(point, position[j, :], mu[j], sigma[j])
             obj += cal_result['obj']
             point -= talpha * cal_result['grad']
-            print("The cost in iteration {} : {}".format(i, obj))
+            # print("The cost in iteration {} : {}".format(i, obj))
             cost_buckets[i] = obj
             x[i] = i
         # print("The cost in iteration {} : {}".format(i, obj))
-    print("The point (x, y, z): {}".format(point))
+    # print("The point (x, y, z): {}".format(point))
     # print("End for the alpha = {}, and the cost is {}".format(alpha, obj))
     # print("cost: {}".format(obj[0]))
     if plot:
@@ -52,37 +50,57 @@ def cal(target, origin, mu, sigma):
     B = A - mu
     C = B / (A * sigma2)
     f = k * np.exp(- np.power(B,2) / (2 * sigma2))
-    # print(f)
     result['obj'] = - np.log(f)
-    # print(-np.log(f))
     result['grad'] = C * diff
     return result
 
-
-
 def test():
-    signal = np.array([150.565986, 2.6762, 14.6845])
-    signal = np.array([14.6854, 14.6854, 14.6845])
+    # signal = np.array([150.565986, 2.6762, 14.6845])
+    # signal = np.array([14.6854, 14.6854, 14.6845])
     # signal = np.array([[2.6762]])
     # signal = np.array([[14.6845]])
-    # signal = np.array([[150.565986]])
+    signal = np.array([[150.565986]])
     d = signal2distance(signal)
     noise = distance2Noise(d)
     print(noise)
     position = np.array([[0, 0, 0]])
-    position = np.array([[0, 50, 0], [0, 0, -50], [0, 50, 50]])
-    result = position_calculation(signal, position)
+    result = MLE_calculation(position, signal, plot=True, alpha=0.00001, color="b")
+    MLE_calculation(position, signal, plot=True, alpha=0.00003, color="r")
+    MLE_calculation(position, signal, plot=True, alpha=0.00005, color="c")
+    MLE_calculation(position, signal, plot=True, alpha=0.0001, color="m")
+    MLE_calculation(position, signal, plot=True, alpha=0.001, color="y")
+
+
+
+
+    plt.show()
+    plt.figure(figsize=(150, 150))
     print("Actual Distance: {}, with estimated: {}".format(d[0], result[0]))
-    print(RSS_cal(result, position[0]))
-    print(RSS_cal(result, position[1]))
-    print(RSS_cal(result, position[2]))
+    # print(RSS_cal(result, position[0]))
+    # print(RSS_cal(result, position[1]))
+    # print(RSS_cal(result, position[2]))
     # print(noise)
     # print(result)
-    plt.show()
 
+@plot(xl="Iteration(#)", yl="Cost")
+def learning_rate_test(signal):
+    d = signal2distance(signal)
+    noise = distance2Noise(d)
+    position = np.array([[0, 0, 0]])
+    tuple_list = [(0.1, 'b'), (0.05, 'g'), (0.03, 'r'), (0.01, 'c'), (0.005, 'm'), (0.001, 'k')]
+    # tuple_list = [(15, 'b')]
+
+    for item in tuple_list:
+        position = np.array([[0, 0, 0]])
+        result = MLE_calculation(position, signal, alpha=item[0], plot=True, color=item[1], times=10000)
+        print("With learning rate: {}, Distance: {}".format(item[0], result[0]))
 
 
 
 if __name__ == '__main__':
-    test()
+    # test()
+    mid_signal = np.array([[14.6845]])
+    min_signal = np.array([[2.6762838290476405]])
+    max_signal = np.array([[150.56598649060965]])
+    learning_rate_test(min_signal)
 

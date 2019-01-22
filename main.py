@@ -2,12 +2,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import random
+from plot_setting import plot
 
 
 A = np.array([[1 / 16], [1 / 16], [1 / 25]])
 C = 285692.36935118 * 1.2
 
-def gradient_run(position, signal, decay_rate=0.9, label='test', alpha=0.04, times=1500, plot=False, decay_turns=50):
+def gradient_run(position, signal, decay_rate=0.95, label='test', alpha=0.03, times=1500, plot=False, decay_turns=50,
+                   color="b"):
     cost_buckets = np.ones(times)
     x = np.ones(times)
     row, col = np.shape(position)
@@ -15,24 +17,24 @@ def gradient_run(position, signal, decay_rate=0.9, label='test', alpha=0.04, tim
     talpha = alpha
     # initial for the estimation result
     #point = np.array([float(random.randrange(30,50)), 0.0, 0.0])
-    point = np.array([50.0, 0.0, 0.0])
+    point = np.array([30.0, 30.0, 30.0])
     for i in range(times):
-        if (i % decay_turns == 0):
-            talpha *= decay_rate
+    #     if (i % decay_turns == 0):
+    #         talpha *= decay_rate
     # initial the obj for every iteration
         obj = 0
         for j in range(row):
             cal_result = calculate(point, position[j, :], signal[j])
             obj += cal_result['obj']
             point -= talpha * cal_result['grad']
-            # print("The cost in iteration {} : {}".format(i, obj[0]))
+            # print("The cost in iteration {} : {}".format(i, obj))
         cost_buckets[i] = obj
         x[i] = i
     # print("The point (x, y, z): {}, {}, {}".format(point[0], point[1], point[2]))
     # print("End for the alpha = {} / N, and the cost is {}".format(alpha, obj))
-    print("cost: {}".format(obj))
+    # print("cost: {}".format(obj))
     if plot:
-        plt.semilogy(x, cost_buckets, label="alpha = {}".format(alpha))
+        plt.semilogy(x, cost_buckets,"".format(), label="alpha = {}".format(alpha))
     return point
 
 def gradient_tunneling(signal, alpha=0.01, decay_rate=0.9, label="test", decay_turns=100, times=1500):
@@ -73,6 +75,7 @@ def test_for_distance(signal):
     result = gradient_run(position, signal, plot=True, alpha=0.01)
     print(result[0])
 
+@plot(xl="Iteration (#)", yl="Cost")
 def test_for_learning_rate(signal):
     tuple_list = [(0.1, 'b'), (0.05, 'g'), (0.03, 'r'), (0.01, 'c'), (0.005, 'm'), (0.001, 'k')]
     # tuple_list = [(0.05, 'g'), (0.01, 'c')]
@@ -80,10 +83,7 @@ def test_for_learning_rate(signal):
         position = np.array([[0, 0, 0]])
         result = gradient_run(position, signal, alpha=item[0], plot=True, color=item[1], times=1000)
         print("With learning rate: {}, Distance: {}".format(item[0] ,result[0]))
-    plt.xlabel('Iteration (#)', fontsize=18)
-    plt.ylabel('Cost', fontsize=18)
-    plt.legend(fontsize=12)
-    plt.show()
+
 
 def test_file(filename):
     data = csv2data("positionData/{}.csv".format(filename))[0,:]

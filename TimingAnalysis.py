@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from plot_setting import plot
+from main import csv2data
 
 def pre_data(filename='test.txt'):
     with open("test.txt", "r") as f:
@@ -10,16 +12,18 @@ def pre_data(filename='test.txt'):
     data = np.asarray(container)
     return data
 
+@plot(xl="Magnetic Flux Density(mT)", yl="Counts(#)")
 def draw_histogram(data):
     plt.hist(data)
-    plt.xlabel("time (ms)")
-    plt.ylabel("counts (#)")
-    plt.show()
+    # plt.xlabel("time (ms)")
+    # plt.ylabel("counts (#)")
+    # plt.show()
+
+
 
 def main():
-    data = pre_data()
-    print(data.mean())
-    draw_histogram(data)
+    data = csv2data()
+    draw_histogram(data[:,3])
 
 
 if __name__ == '__main__':

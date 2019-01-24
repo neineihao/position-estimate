@@ -49,38 +49,16 @@ def cal(target, origin, mu, sigma):
     A = np.power(np.power(diff, 2).sum(), 0.5)
     B = A - mu
     C = B / (A * sigma2)
-    f = k * np.exp(- np.power(B,2) / (2 * sigma2))
-    result['obj'] = - np.log(f)
+    # f = k * np.exp(- np.power(B,2) / (2 * sigma2))
+    # print(-np.log(f))
+    f = - k + np.power(B,2) / (2 * sigma2)
+    # print(f2)
+    # result['obj'] = - np.log(f)
+    result['obj'] = f
     result['grad'] = C * diff
     return result
 
-def test():
-    # signal = np.array([150.565986, 2.6762, 14.6845])
-    # signal = np.array([14.6854, 14.6854, 14.6845])
-    # signal = np.array([[2.6762]])
-    # signal = np.array([[14.6845]])
-    signal = np.array([[150.565986]])
-    d = signal2distance(signal)
-    noise = distance2Noise(d)
-    print(noise)
-    position = np.array([[0, 0, 0]])
-    result = MLE_calculation(position, signal, plot=True, alpha=0.00001, color="b")
-    MLE_calculation(position, signal, plot=True, alpha=0.00003, color="r")
-    MLE_calculation(position, signal, plot=True, alpha=0.00005, color="c")
-    MLE_calculation(position, signal, plot=True, alpha=0.0001, color="m")
-    MLE_calculation(position, signal, plot=True, alpha=0.001, color="y")
 
-
-
-
-    plt.show()
-    plt.figure(figsize=(150, 150))
-    print("Actual Distance: {}, with estimated: {}".format(d[0], result[0]))
-    # print(RSS_cal(result, position[0]))
-    # print(RSS_cal(result, position[1]))
-    # print(RSS_cal(result, position[2]))
-    # print(noise)
-    # print(result)
 
 @plot(xl="Iteration(#)", yl="Cost")
 def learning_rate_test(signal):
@@ -102,5 +80,5 @@ if __name__ == '__main__':
     mid_signal = np.array([[14.6845]])
     min_signal = np.array([[2.6762838290476405]])
     max_signal = np.array([[150.56598649060965]])
-    learning_rate_test(min_signal)
+    learning_rate_test(mid_signal)
 

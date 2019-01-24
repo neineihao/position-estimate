@@ -5,7 +5,8 @@ import random
 from plot_setting import plot
 
 
-A = np.array([[1 / 16], [1 / 16], [1 / 25]])
+# A = np.array([[1 / 16], [1 / 16], [1 / 25]])
+A = np.array([[1 / 16], [1 / 16], [1 / 16]])
 C = 285692.36935118 * 1.2
 
 def gradient_run(position, signal, decay_rate=0.95, label='test', alpha=0.03, times=1500, plot=False, decay_turns=50,
@@ -59,7 +60,8 @@ def calculate(cal, position, signal):
     a2 = C * np.power(a1, -1.5) - signal
     r_dic['obj'] = np.power(a2, 2)
     grad_co = -3 * C * np.power(a1, -5/2) * a2
-    r_dic['grad'] = grad_co * np.multiply(dif, np.array([ 1/8,  1/8, 2/25]))
+    # r_dic['grad'] = grad_co * np.multiply(dif, np.array([1 / 8, 1 / 8, 2 / 25]))
+    r_dic['grad'] = grad_co * np.multiply(dif, np.array([1 / 8, 1 / 8, 1 / 8]))
     return r_dic
 
 def test():

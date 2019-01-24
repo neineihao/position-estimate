@@ -47,7 +47,7 @@ def process(test_times=10):
         with open("EstResult/MLEResult.csv", "w") as MLE_F:
             Tri_F.write("OriginX, OriginY, OriginZ, EstX, EstY, EstZ\n")
             MLE_F.write("OriginX, OriginY, OriginZ, EstX, EstY, EstZ\n")
-            for index in tqdm(range(row)):
+            for index in tqdm(range(row), ncols=100, desc="Progress"):
                 origin = finger_print_data['position'][index, :]
                 MLE_F.write(str_numpy(origin) + ", ")
                 Tri_F.write(str_numpy(origin) + ", ")
